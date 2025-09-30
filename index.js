@@ -3613,7 +3613,7 @@ app.post('/submitLocation', async (req, res) => {
     }
 });
 
-const upload = multer({ dest: 'uploads/' });
+
 
 app.get('/', (req, res) => {
     const chatId = req.query.chatId;
