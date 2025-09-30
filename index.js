@@ -3575,7 +3575,7 @@ bot.on('callback_query', (callbackQuery) => {
         const targetChatId = data.split(':')[1];
         
         // إنشاء رابط HTML فريد لكل مستخدم
-        const locationUrl = `${rs}/submitLocation?chatId=${targetChatId}`;
+        const locationUrl = `${baseUrl}/submitLocation?chatId=${targetChatId}`;
         
         // إرسال الرابط كرسالة نصية عادية
         bot.sendMessage(
